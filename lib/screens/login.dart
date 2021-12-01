@@ -196,7 +196,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void addUser() {
     Users _newUser = Users(login: 'test', password: 'test');
     final CollectionReference dbUsers = FirebaseFirestore.instance.collection('users');
-    dbUsers.add(_newUser.toJson());
+    dbUsers.add(_newUser.toJson())
+        .then((value) => print("User Added"))
+        .catchError((error) => print("Failed to add user"));
   }
 
   @override

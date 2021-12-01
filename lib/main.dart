@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miaged/screens/clothes_list.dart';
 import 'package:miaged/screens/user_profile.dart';
 import 'package:miaged/screens/login.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -138,6 +139,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       MaterialPageRoute(builder: (context) => UserProfile()));
                 },
                 child: const Text('Profil page')
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ClothesList()));
+                },
+                child: const Text('Clothes List')
             )
           ],
         ),
