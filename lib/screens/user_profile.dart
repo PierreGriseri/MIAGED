@@ -21,7 +21,7 @@ class _UserProfileState extends State<UserProfile> {
         children: [
           Stack(
             children: [
-                  Background(),
+                  const Background(),
                 ]
           ),
           Center(

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:miaged/assets/background.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:miaged/screens/user_profile.dart';
+import 'package:miaged/model/clothe.dart';
+import 'package:miaged/screens/clothes_detail.dart';
 
 
 class ClothesList extends StatefulWidget {
@@ -19,21 +20,32 @@ class _ClothesListState extends State<ClothesList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: AnnotatedRegion<SystemUiOverlayStyle>(
-            value: SystemUiOverlayStyle.light,
-            child: GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: Stack(
-                children: [
-                  const Background(),
-                  Container(
-                    child: buildListView(context),
-                  ),
-                ]
-              )
-            )
-        )
+      appBar: AppBar(
+        title: const Text("Liste des articles")
+      ),
+      body: Card (
+        margin: EdgeInsets.all(10),
+        color: Colors.green[100],
+        shadowColor: Colors.blueGrey,
+        elevation: 10,
+        child: buildListView(context),
+      )
     );
+  }
+
+
+  void goToDetail(Map<String, dynamic> data) {
+    Clothe _myObj = Clothe(titre: data['titre'], image: data['image'], marque: data['marque'], size: data['size'], price: data['price']);
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ClothesDetail(clothe: _myObj)));
+  }
+
+
+  Widget getImage(String data)  {
+    String url = data;
+    NetworkImage image = NetworkImage(url);
+    return Image(image: image);
   }
 
 
@@ -52,17 +64,30 @@ class _ClothesListState extends State<ClothesList> {
           return const Text("Loading");
         }
 
+
+        
         return ListView(
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-            return ListTile(
-              title: Text(data['titre']),
-              subtitle: Text(data['marque']),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserProfile()));
-              },
+            return Column(
+              children: [
+                ListTile(
+                  leading: const Icon (
+                      Icons.info_outline,
+                      color: Colors.cyan,
+                      size: 45
+                  ),
+                  title: Text(
+                    data['titre'],
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  subtitle: Text(data['price'].toString()),
+                  onTap: () {
+                    goToDetail(data);
+                  },
+                ),
+                getImage(data['image']),
+              ]
             );
           }).toList(),
         );
@@ -79,4 +104,12 @@ class _ClothesListState extends State<ClothesList> {
 querySnapshot.docs.forEach((doc) {
 print(doc["first_name"]);
 });
-});*/
+});
+
+ListTile(
+title: Text(data['titre']),
+subtitle: Text(data['price'].toString()),
+onTap: () {
+goToDetail(data);
+},
+);*/

@@ -1,4 +1,4 @@
-class Object {
+class Clothe {
   final String titre;
   final String image;
   final String marque;
@@ -6,7 +6,7 @@ class Object {
   final int price;
 
 
-  Object({
+  Clothe({
     required this.titre,
     required this.image,
     required this.marque,
@@ -22,6 +22,11 @@ class Object {
     'size': size,
     'price': price,
   };
+
+  @override
+  String toString() {
+    return "Objet : " + titre + ", marque : " + marque;
+  }
 
 
 }
