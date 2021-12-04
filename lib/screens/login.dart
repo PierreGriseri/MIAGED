@@ -1,103 +1,9 @@
-/*import 'package:flutter/material.dart';
-
-class Login extends StatefulWidget {
-
-  const Login({Key? key}): super(key: key);
-
-  @override
-  _LoginState createState() => _LoginState();
-}
-
-class _LoginState extends State<Login> {
-
-
-
-  _buildEmailForm() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-      Text(
-          'Login'
-      ),
-      SizedBox(height: 10.0),
-      Container(
-          alignment: Alignment.centerLeft,
-          height: 60.0,
-          child: TextField(
-              keyboardType: TextInputType.emailAddress,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.only(top: 14.0),
-                prefixIcon: Icon(
-                  Icons.email,
-                  color: Colors.white,
-                ),
-                hintText: 'Login',
-              )
-          )
-      )
-    ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Stack(children: [
-          Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end : Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF73AEF5),
-                      Color(0xFF61A4F1),
-                      Color(0xFF478DE0),
-                      Color(0xFF398AE5),
-                    ],
-                    stops: [0.1, 0.4, 0.7, 0.9],
-                  )
-              )
-        ),
-          Container(
-            height: double.infinity,
-            child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(
-                    horizontal: 40.0,
-                    vertical: 120.0,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      'Sign in',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'OpenSans',
-                        fontSize: 30.0,
-                        fontWeight: FontWeight.bold,
-                      )
-                    ),
-                    SizedBox(height: 30.0),
-                    _buildEmailForm(),
-                  ],
-                ),
-              ),
-            ),
-          ], // <Widget>[]
-        ),
-    );
-  }
-
-}              */
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:miaged/assets/background.dart';
-import 'package:miaged/model/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:miaged/screens/clothes_list.dart';
 
 class LoginScreen extends StatefulWidget {
 
@@ -109,31 +15,37 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
 
+  String loginField = "";
+  String passwordField = "";
+
   Widget _buildEmailTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
        const Text(
-          'Email',
+          'Login',
         ),
         const SizedBox(height: 10.0),
         Container(
           alignment: Alignment.centerLeft,
           height: 60.0,
-          child: const TextField(
+          child: TextField(
             keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
+            onChanged: (value) {
+              loginField = value;
+              print(loginField);
+            },
+            style: const TextStyle(
               color: Colors.white,
               fontFamily: 'OpenSans',
             ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
+            decoration: const InputDecoration(
               contentPadding: EdgeInsets.only(top: 14.0),
               prefixIcon: Icon(
-                Icons.email,
+                Icons.face,
                 color: Colors.white,
               ),
-              hintText: 'Enter your Email',
+              hintText: 'Enter your login name',
             ),
           ),
         ),
@@ -145,21 +57,24 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        const Text(
           'Password',
         ),
-        SizedBox(height: 10.0),
+        const SizedBox(height: 10.0),
         Container(
           alignment: Alignment.centerLeft,
           height: 60.0,
           child: TextField(
+            onChanged: (value) {
+              passwordField = value;
+              print(passwordField);
+            },
             obscureText: true,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontFamily: 'OpenSans',
             ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
+            decoration: const InputDecoration(
               contentPadding: EdgeInsets.only(top: 14.0),
               prefixIcon: Icon(
                 Icons.lock,
@@ -175,30 +90,129 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginBtn() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 25.0),
+      padding: const EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: addUser,
-        child: const Text(
-          'LOGIN',
+      child: ElevatedButton.icon(
+        icon: const Icon(
+          Icons.login,
+        ),
+        label: const Text(
+          "LOGIN",
           style: TextStyle(
-            color: Color(0xFF527DAA),
+            color: Colors.white,
             letterSpacing: 1.5,
             fontSize: 18.0,
             fontWeight: FontWeight.bold,
             fontFamily: 'OpenSans',
           ),
         ),
+        onPressed: login,
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(Colors.deepPurple),
+        ),
       ),
     );
   }
 
-  void addUser() {
-    Users _newUser = Users(login: 'test', password: 'test');
-    final CollectionReference dbUsers = FirebaseFirestore.instance.collection('users');
-    dbUsers.add(_newUser.toJson())
-        .then((value) => print("User Added"))
-        .catchError((error) => print("Failed to add user"));
+  Widget _buildCreateAccountBtn() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 25.0),
+      width: double.infinity,
+      child: TextButton(
+        child: const Text(
+          "Create an account",
+          style: TextStyle(
+            color: Colors.white,
+            letterSpacing: 1.5,
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'OpenSans',
+          ),
+        ),
+        onPressed: addUser,
+      )
+    );
+  }
+
+
+  Future<void> login() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: loginField,
+          password: passwordField
+      );
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ClothesList()));
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    }
+  }
+
+  Future<void> addUser() async {
+    if (loginField == "" || passwordField == "") {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text("Miss information"),
+            content: const Text(
+              "Ether your login or your password is empty... or both"),
+            elevation: 10.0,
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          )
+      );
+    }
+    else {
+      try {
+        UserCredential cred = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+            email: loginField, password: passwordField);
+      }
+      on FirebaseException catch (e) {
+        if (e.code == 'weak-password') {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text("Password"),
+                content: const Text("Your password is to weak"),
+                elevation: 10.0,
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'OK'),
+                    child: const Text('OK'),
+                  ),
+                ],
+              )
+          );
+        } else if (e.code == 'email-already-in-use') {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text("Email"),
+                content: const Text("This email already exist"),
+                elevation: 10.0,
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'OK'),
+                    child: const Text('OK'),
+                  ),
+                ],
+              )
+          );
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
   @override
@@ -236,6 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 30.0),
                       _buildPasswordTF(),
                       _buildLoginBtn(),
+                      _buildCreateAccountBtn(),
                     ],
                   ),
                 ),
