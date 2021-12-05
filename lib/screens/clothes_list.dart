@@ -28,13 +28,13 @@ class _ClothesListState extends State<ClothesList> {
     else if(index == 1) {
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ClothesList())
+          MaterialPageRoute(builder: (context) => const ClothesList())
       );
     }
     else {
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => UserProfile())
+          MaterialPageRoute(builder: (context) => const UserProfile())
       );
     }
 
@@ -47,7 +47,7 @@ class _ClothesListState extends State<ClothesList> {
         title: const Text("Liste des articles")
       ),
       body: Card (
-        margin: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(10),
         color: Colors.green[100],
         shadowColor: Colors.blueGrey,
         elevation: 10,

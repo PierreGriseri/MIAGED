@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:miaged/assets/background.dart';
 import 'package:miaged/model/clothe.dart';
 
 
