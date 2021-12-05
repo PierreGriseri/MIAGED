@@ -5,6 +5,9 @@ import 'package:miaged/assets/background.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:miaged/screens/clothes_list.dart';
 
+
+
+
 class LoginScreen extends StatefulWidget {
 
   const LoginScreen({Key? key}): super(key: key);
@@ -33,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
             keyboardType: TextInputType.emailAddress,
             onChanged: (value) {
               loginField = value;
-              print(loginField);
             },
             style: const TextStyle(
               color: Colors.white,
@@ -67,7 +69,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextField(
             onChanged: (value) {
               passwordField = value;
-              print(passwordField);
             },
             obscureText: true,
             style: const TextStyle(
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Icons.login,
         ),
         label: const Text(
-          "LOGIN",
+          "Se connecter",
           style: TextStyle(
             color: Colors.white,
             letterSpacing: 1.5,
@@ -134,7 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-
   Future<void> login() async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ClothesList()));
+          MaterialPageRoute(builder: (context) => const ClothesList()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
@@ -154,6 +154,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> addUser() async {
+
+    Timestamp dt = Timestamp.now();
     if (loginField == "" || passwordField == "") {
       showDialog(
           context: context,
@@ -176,6 +178,15 @@ class _LoginScreenState extends State<LoginScreen> {
         UserCredential cred = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
             email: loginField, password: passwordField);
+        var CurrentUser = FirebaseAuth.instance.currentUser;
+        CollectionReference user = FirebaseFirestore.instance.collection('users');
+        user.add({
+         'login': loginField,
+          'birth': dt,
+          'address': "",
+          'ville': "",
+          'postalCode': "",
+        }).then((value) => print('User Added'));
       }
       on FirebaseException catch (e) {
         if (e.code == 'weak-password') {
@@ -225,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Stack(
             children: [
               const Background(),
-              Container(
+              SizedBox(
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),

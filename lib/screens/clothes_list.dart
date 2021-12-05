@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:miaged/assets/background.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:miaged/model/clothe.dart';
 import 'package:miaged/screens/clothes_detail.dart';
+import 'package:miaged/screens/user_profile.dart';
 
 
 class ClothesList extends StatefulWidget {
@@ -17,6 +16,30 @@ class ClothesList extends StatefulWidget {
 
 class _ClothesListState extends State<ClothesList> {
 
+  final int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    if(index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ClothesList())
+      );
+    }
+    else if(index == 1) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ClothesList())
+      );
+    }
+    else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UserProfile())
+      );
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +52,26 @@ class _ClothesListState extends State<ClothesList> {
         shadowColor: Colors.blueGrey,
         elevation: 10,
         child: buildListView(context),
-      )
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.monetization_on),
+            label: 'Acheter',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Panier',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_circle),
+            label: 'Profil',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
     );
   }
 
@@ -64,8 +106,6 @@ class _ClothesListState extends State<ClothesList> {
           return const Text("Loading");
         }
 
-
-        
         return ListView(
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
@@ -95,21 +135,3 @@ class _ClothesListState extends State<ClothesList> {
     );
   }
 }
-
-//FOR EACH POUR AFFICHAGE
-/*FirebaseFirestore.instance
-    .collection('users')
-.get()
-    .then((QuerySnapshot querySnapshot) {
-querySnapshot.docs.forEach((doc) {
-print(doc["first_name"]);
-});
-});
-
-ListTile(
-title: Text(data['titre']),
-subtitle: Text(data['price'].toString()),
-onTap: () {
-goToDetail(data);
-},
-);*/
